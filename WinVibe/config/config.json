@@ -9,6 +9,12 @@
       "enabled": true,
       "debloat": true,
       "registryTweaks": true,
+      "performanceTweaks": true,
+      "privacyTweaks": true,
+      "networkTweaks": true,
+      "storageTweaks": true,
+      "gamingTweaks": true,
+      "startupTweaks": true,
       "serviceTweaks": true,
       "dynamicPowerPlan": true
     },

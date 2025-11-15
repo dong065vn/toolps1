@@ -1,10 +1,12 @@
 <#
 .SYNOPSIS
-    Optimize Module - Tối ưu hóa Windows
+    Optimize Module - Tối ưu hóa Windows (Enhanced Edition)
 .DESCRIPTION
-    Module thực hiện debloat, registry tweaks, service optimization và Dynamic Power Management
+    Module thực hiện debloat, registry tweaks, service optimization,
+    Dynamic Power Management và các tối ưu đặc biệt cho Performance,
+    Privacy, Network, Storage, Gaming
 .NOTES
-    Version: 1.0.0
+    Version: 2.0.0 - Enhanced Edition
 #>
 
 # ============================================================================
@@ -87,7 +89,7 @@ function Invoke-Debloat {
 }
 
 # ============================================================================
-# REGISTRY TWEAKS
+# REGISTRY TWEAKS (BASIC + ENHANCED)
 # ============================================================================
 
 function Set-RegistryTweaks {
@@ -101,6 +103,8 @@ function Set-RegistryTweaks {
     Write-Host ""
 
     $tweaks = @(
+        # === BASIC TWEAKS ===
+
         # Disable telemetry
         @{
             Path = "HKLM:\SOFTWARE\Policies\Microsoft\Windows\DataCollection"
@@ -162,6 +166,120 @@ function Set-RegistryTweaks {
             Value = 1
             Type = "DWord"
             Description = "Tắt tìm kiếm web trong Start Menu"
+        },
+
+        # === PRIVACY & SECURITY ENHANCED ===
+
+        # Disable Advertising ID
+        @{
+            Path = "HKCU:\Software\Microsoft\Windows\CurrentVersion\AdvertisingInfo"
+            Name = "Enabled"
+            Value = 0
+            Type = "DWord"
+            Description = "Tắt Advertising ID"
+        },
+
+        # Disable Timeline
+        @{
+            Path = "HKLM:\SOFTWARE\Policies\Microsoft\Windows\System"
+            Name = "EnableActivityFeed"
+            Value = 0
+            Type = "DWord"
+            Description = "Tắt Windows Timeline"
+        },
+
+        # Disable Cortana
+        @{
+            Path = "HKLM:\SOFTWARE\Policies\Microsoft\Windows\Windows Search"
+            Name = "AllowCortana"
+            Value = 0
+            Type = "DWord"
+            Description = "Tắt Cortana"
+        },
+
+        # Disable Web Search in Taskbar
+        @{
+            Path = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Search"
+            Name = "BingSearchEnabled"
+            Value = 0
+            Type = "DWord"
+            Description = "Tắt Bing Search trong Taskbar"
+        },
+
+        # Disable App Suggestions
+        @{
+            Path = "HKCU:\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager"
+            Name = "SubscribedContent-338388Enabled"
+            Value = 0
+            Type = "DWord"
+            Description = "Tắt App Suggestions"
+        },
+
+        # === PERFORMANCE TWEAKS ===
+
+        # Disable animations
+        @{
+            Path = "HKCU:\Control Panel\Desktop\WindowMetrics"
+            Name = "MinAnimate"
+            Value = "0"
+            Type = "String"
+            Description = "Tắt window animations"
+        },
+
+        # Disable Transparency Effects
+        @{
+            Path = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize"
+            Name = "EnableTransparency"
+            Value = 0
+            Type = "DWord"
+            Description = "Tắt transparency effects"
+        },
+
+        # Disable Aero Shake
+        @{
+            Path = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced"
+            Name = "DisallowShaking"
+            Value = 1
+            Type = "DWord"
+            Description = "Tắt Aero Shake"
+        },
+
+        # Enable Game Mode
+        @{
+            Path = "HKCU:\Software\Microsoft\GameBar"
+            Name = "AutoGameModeEnabled"
+            Value = 1
+            Type = "DWord"
+            Description = "Bật Game Mode"
+        },
+
+        # === NETWORK TWEAKS ===
+
+        # Disable Large Send Offload
+        @{
+            Path = "HKLM:\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters"
+            Name = "DisableTaskOffload"
+            Value = 0
+            Type = "DWord"
+            Description = "Tối ưu TCP offload"
+        },
+
+        # Optimize TCP Window Size
+        @{
+            Path = "HKLM:\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters"
+            Name = "Tcp1323Opts"
+            Value = 1
+            Type = "DWord"
+            Description = "Bật TCP Window Scaling"
+        },
+
+        # Disable Nagle's Algorithm (reduce latency)
+        @{
+            Path = "HKLM:\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters\Interfaces"
+            Name = "TcpAckFrequency"
+            Value = 1
+            Type = "DWord"
+            Description = "Giảm network latency"
         }
     )
 
@@ -187,6 +305,572 @@ function Set-RegistryTweaks {
 
     Write-Host ""
     Write-Host "  📊 Đã áp dụng $appliedCount/$($tweaks.Count) tweaks" -ForegroundColor Cyan
+}
+
+# ============================================================================
+# PERFORMANCE OPTIMIZATION (NEW!)
+# ============================================================================
+
+function Optimize-Performance {
+    <#
+    .SYNOPSIS
+        Tối ưu hiệu suất Windows
+    #>
+
+    Write-Host ""
+    Write-Host "  ⚡ Tối ưu Performance..." -ForegroundColor Yellow
+    Write-Host ""
+
+    # 1. Disable Visual Effects
+    Write-Host "  🎨 Tắt Visual Effects không cần thiết..." -ForegroundColor Cyan
+
+    try {
+        $visualFXPath = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\VisualEffects"
+        if (-not (Test-Path $visualFXPath)) {
+            New-Item -Path $visualFXPath -Force | Out-Null
+        }
+        Set-ItemProperty -Path $visualFXPath -Name "VisualFXSetting" -Value 2 -Type DWord
+        Write-Host "      ✅ Đã tối ưu Visual Effects" -ForegroundColor Green
+    }
+    catch {
+        Write-Warning "      ⚠️  Lỗi khi tắt visual effects: $_"
+    }
+
+    # 2. Optimize Virtual Memory
+    Write-Host "  💾 Tối ưu Virtual Memory (Pagefile)..." -ForegroundColor Cyan
+
+    try {
+        # Get RAM size
+        $ram = (Get-CimInstance Win32_PhysicalMemory | Measure-Object -Property Capacity -Sum).Sum / 1GB
+
+        # Calculate optimal pagefile size (1.5x RAM)
+        $pagefileSize = [math]::Round($ram * 1.5 * 1024)
+
+        Write-Host "      📊 RAM: $([math]::Round($ram, 2)) GB" -ForegroundColor DarkGray
+        Write-Host "      📊 Pagefile: $pagefileSize MB" -ForegroundColor DarkGray
+
+        # Set pagefile to system managed for now (safer)
+        $computersys = Get-WmiObject Win32_ComputerSystem -EnableAllPrivileges
+        $computersys.AutomaticManagedPagefile = $true
+        $computersys.Put() | Out-Null
+
+        Write-Host "      ✅ Đã tối ưu Pagefile" -ForegroundColor Green
+    }
+    catch {
+        Write-Warning "      ⚠️  Lỗi khi tối ưu pagefile: $_"
+    }
+
+    # 3. Disable Superfetch/SysMain (for SSD)
+    Write-Host "  🔥 Tối ưu cho SSD (Disable Superfetch/SysMain)..." -ForegroundColor Cyan
+
+    try {
+        # Check if SSD exists
+        $disk = Get-PhysicalDisk | Where-Object { $_.MediaType -eq "SSD" } | Select-Object -First 1
+
+        if ($disk) {
+            Write-Host "      💿 Phát hiện SSD: $($disk.FriendlyName)" -ForegroundColor DarkGray
+
+            # Disable SysMain (Superfetch)
+            $sysmain = Get-Service -Name "SysMain" -ErrorAction SilentlyContinue
+            if ($sysmain) {
+                Stop-Service -Name "SysMain" -Force -ErrorAction SilentlyContinue
+                Set-Service -Name "SysMain" -StartupType Disabled -ErrorAction SilentlyContinue
+                Write-Host "      ✅ Đã tắt SysMain (Superfetch)" -ForegroundColor Green
+            }
+        }
+        else {
+            Write-Host "      ⏭️  Không phát hiện SSD, bỏ qua..." -ForegroundColor DarkGray
+        }
+    }
+    catch {
+        Write-Warning "      ⚠️  Lỗi khi tối ưu SSD: $_"
+    }
+
+    # 4. Disable Windows Search Indexing (optional)
+    Write-Host "  🔍 Giảm tải Windows Search..." -ForegroundColor Cyan
+
+    try {
+        $wsearch = Get-Service -Name "WSearch" -ErrorAction SilentlyContinue
+        if ($wsearch -and $wsearch.Status -eq "Running") {
+            # Set to Manual instead of Disabled (safer)
+            Set-Service -Name "WSearch" -StartupType Manual -ErrorAction SilentlyContinue
+            Write-Host "      ✅ Đã chuyển Windows Search sang Manual" -ForegroundColor Green
+        }
+    }
+    catch {
+        Write-Warning "      ⚠️  Lỗi khi tối ưu Windows Search: $_"
+    }
+
+    Write-Host ""
+    Write-Host "  ✅ Performance optimization hoàn thành!" -ForegroundColor Green
+}
+
+# ============================================================================
+# PRIVACY & SECURITY OPTIMIZATION (NEW!)
+# ============================================================================
+
+function Optimize-Privacy {
+    <#
+    .SYNOPSIS
+        Tối ưu Privacy & Security
+    #>
+
+    Write-Host ""
+    Write-Host "  🔒 Tối ưu Privacy & Security..." -ForegroundColor Yellow
+    Write-Host ""
+
+    # 1. Block Telemetry Hosts
+    Write-Host "  🚫 Block Telemetry Hosts..." -ForegroundColor Cyan
+
+    try {
+        $hostsFile = "$env:SystemRoot\System32\drivers\etc\hosts"
+
+        $telemetryHosts = @(
+            "vortex.data.microsoft.com",
+            "vortex-win.data.microsoft.com",
+            "telecommand.telemetry.microsoft.com",
+            "telecommand.telemetry.microsoft.com.nsatc.net",
+            "oca.telemetry.microsoft.com",
+            "sqm.telemetry.microsoft.com",
+            "watson.telemetry.microsoft.com",
+            "redir.metaservices.microsoft.com",
+            "choice.microsoft.com",
+            "df.telemetry.microsoft.com",
+            "reports.wes.df.telemetry.microsoft.com",
+            "wes.df.telemetry.microsoft.com",
+            "services.wes.df.telemetry.microsoft.com",
+            "sqm.df.telemetry.microsoft.com",
+            "telemetry.microsoft.com",
+            "watson.ppe.telemetry.microsoft.com",
+            "telemetry.appex.bing.net",
+            "telemetry.urs.microsoft.com",
+            "telemetry.appex.bing.net:443",
+            "settings-sandbox.data.microsoft.com",
+            "vortex-sandbox.data.microsoft.com",
+            "survey.watson.microsoft.com",
+            "watson.live.com",
+            "watson.microsoft.com",
+            "statsfe2.ws.microsoft.com",
+            "corpext.msitadfs.glbdns2.microsoft.com",
+            "compatexchange.cloudapp.net",
+            "cs1.wpc.v0cdn.net",
+            "a-0001.a-msedge.net",
+            "statsfe2.update.microsoft.com.akadns.net",
+            "sls.update.microsoft.com.akadns.net",
+            "fe2.update.microsoft.com.akadns.net",
+            "diagnostics.support.microsoft.com",
+            "corp.sts.microsoft.com",
+            "statsfe1.ws.microsoft.com",
+            "pre.footprintpredict.com",
+            "i1.services.social.microsoft.com",
+            "i1.services.social.microsoft.com.nsatc.net",
+            "feedback.windows.com",
+            "feedback.microsoft-hohm.com",
+            "feedback.search.microsoft.com"
+        )
+
+        # Read existing hosts file
+        $hostsContent = Get-Content $hostsFile -ErrorAction Stop
+
+        $addedCount = 0
+        $newEntries = @()
+
+        foreach ($host in $telemetryHosts) {
+            $entry = "0.0.0.0 $host"
+
+            # Check if already exists
+            if ($hostsContent -notcontains $entry) {
+                $newEntries += $entry
+                $addedCount++
+            }
+        }
+
+        if ($addedCount -gt 0) {
+            # Add WinVibe marker
+            Add-Content -Path $hostsFile -Value "`n# WinVibe Telemetry Blocking" -Force
+            Add-Content -Path $hostsFile -Value $newEntries -Force
+
+            Write-Host "      ✅ Đã block $addedCount telemetry hosts" -ForegroundColor Green
+        }
+        else {
+            Write-Host "      ⏭️  Telemetry hosts đã được block trước đó" -ForegroundColor DarkGray
+        }
+    }
+    catch {
+        Write-Warning "      ⚠️  Lỗi khi block telemetry hosts: $_"
+    }
+
+    # 2. Disable Cortana completely
+    Write-Host "  🎤 Vô hiệu hóa Cortana hoàn toàn..." -ForegroundColor Cyan
+
+    try {
+        $cortanaPath = "HKLM:\SOFTWARE\Policies\Microsoft\Windows\Windows Search"
+        if (-not (Test-Path $cortanaPath)) {
+            New-Item -Path $cortanaPath -Force | Out-Null
+        }
+
+        Set-ItemProperty -Path $cortanaPath -Name "AllowCortana" -Value 0 -Type DWord -Force
+        Set-ItemProperty -Path $cortanaPath -Name "AllowSearchToUseLocation" -Value 0 -Type DWord -Force
+        Set-ItemProperty -Path $cortanaPath -Name "DisableWebSearch" -Value 1 -Type DWord -Force
+        Set-ItemProperty -Path $cortanaPath -Name "ConnectedSearchUseWeb" -Value 0 -Type DWord -Force
+
+        Write-Host "      ✅ Đã vô hiệu hóa Cortana" -ForegroundColor Green
+    }
+    catch {
+        Write-Warning "      ⚠️  Lỗi khi vô hiệu hóa Cortana: $_"
+    }
+
+    Write-Host ""
+    Write-Host "  ✅ Privacy & Security optimization hoàn thành!" -ForegroundColor Green
+}
+
+# ============================================================================
+# NETWORK OPTIMIZATION (NEW!)
+# ============================================================================
+
+function Optimize-Network {
+    <#
+    .SYNOPSIS
+        Tối ưu Network Performance
+    #>
+
+    Write-Host ""
+    Write-Host "  🌐 Tối ưu Network..." -ForegroundColor Yellow
+    Write-Host ""
+
+    # 1. Disable QoS Bandwidth Reservation
+    Write-Host "  📡 Tắt QoS Bandwidth Reservation..." -ForegroundColor Cyan
+
+    try {
+        $qosPath = "HKLM:\SOFTWARE\Policies\Microsoft\Windows\Psched"
+        if (-not (Test-Path $qosPath)) {
+            New-Item -Path $qosPath -Force | Out-Null
+        }
+
+        Set-ItemProperty -Path $qosPath -Name "NonBestEffortLimit" -Value 0 -Type DWord -Force
+        Write-Host "      ✅ Đã tắt QoS bandwidth reservation" -ForegroundColor Green
+    }
+    catch {
+        Write-Warning "      ⚠️  Lỗi: $_"
+    }
+
+    # 2. Disable Windows Update P2P Delivery
+    Write-Host "  🔄 Tắt Windows Update P2P Delivery..." -ForegroundColor Cyan
+
+    try {
+        $doPath = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\DeliveryOptimization\Config"
+        if (-not (Test-Path $doPath)) {
+            New-Item -Path $doPath -Force | Out-Null
+        }
+
+        Set-ItemProperty -Path $doPath -Name "DODownloadMode" -Value 0 -Type DWord -Force
+        Write-Host "      ✅ Đã tắt P2P delivery" -ForegroundColor Green
+    }
+    catch {
+        Write-Warning "      ⚠️  Lỗi: $_"
+    }
+
+    # 3. Optimize DNS Cache
+    Write-Host "  🔍 Tối ưu DNS Cache..." -ForegroundColor Cyan
+
+    try {
+        # Increase DNS cache size
+        $dnsPath = "HKLM:\SYSTEM\CurrentControlSet\Services\Dnscache\Parameters"
+
+        Set-ItemProperty -Path $dnsPath -Name "CacheHashTableBucketSize" -Value 1 -Type DWord -Force
+        Set-ItemProperty -Path $dnsPath -Name "CacheHashTableSize" -Value 384 -Type DWord -Force
+        Set-ItemProperty -Path $dnsPath -Name "MaxCacheEntryTtlLimit" -Value 64000 -Type DWord -Force
+        Set-ItemProperty -Path $dnsPath -Name "MaxSOACacheEntryTtlLimit" -Value 301 -Type DWord -Force
+
+        Write-Host "      ✅ Đã tối ưu DNS cache" -ForegroundColor Green
+    }
+    catch {
+        Write-Warning "      ⚠️  Lỗi: $_"
+    }
+
+    # 4. TCP/IP Optimization
+    Write-Host "  ⚡ Tối ưu TCP/IP Stack..." -ForegroundColor Cyan
+
+    try {
+        # Enable TCP Fast Open
+        netsh int tcp set global fastopen=enabled 2>&1 | Out-Null
+
+        # Optimize auto-tuning
+        netsh int tcp set global autotuninglevel=normal 2>&1 | Out-Null
+
+        # Enable ECN
+        netsh int tcp set global ecncapability=enabled 2>&1 | Out-Null
+
+        Write-Host "      ✅ Đã tối ưu TCP/IP stack" -ForegroundColor Green
+    }
+    catch {
+        Write-Warning "      ⚠️  Lỗi: $_"
+    }
+
+    Write-Host ""
+    Write-Host "  ✅ Network optimization hoàn thành!" -ForegroundColor Green
+}
+
+# ============================================================================
+# STORAGE OPTIMIZATION (NEW!)
+# ============================================================================
+
+function Optimize-Storage {
+    <#
+    .SYNOPSIS
+        Tối ưu Storage
+    #>
+
+    Write-Host ""
+    Write-Host "  💿 Tối ưu Storage..." -ForegroundColor Yellow
+    Write-Host ""
+
+    # 1. Disable Hibernation
+    Write-Host "  💤 Vô hiệu hóa Hibernation..." -ForegroundColor Cyan
+
+    try {
+        $hiberfil = "$env:SystemDrive\hiberfil.sys"
+        $hiberSize = 0
+
+        if (Test-Path $hiberfil) {
+            $hiberSize = (Get-Item $hiberfil).Length / 1GB
+            Write-Host "      📊 Kích thước hiberfil.sys: $([math]::Round($hiberSize, 2)) GB" -ForegroundColor DarkGray
+        }
+
+        powercfg /hibernate off 2>&1 | Out-Null
+
+        if ($hiberSize -gt 0) {
+            Write-Host "      ✅ Đã tắt hibernation (Giải phóng: $([math]::Round($hiberSize, 2)) GB)" -ForegroundColor Green
+        }
+        else {
+            Write-Host "      ✅ Đã tắt hibernation" -ForegroundColor Green
+        }
+    }
+    catch {
+        Write-Warning "      ⚠️  Lỗi: $_"
+    }
+
+    # 2. Enable Compact OS (compress Windows files)
+    Write-Host "  📦 Kiểm tra Compact OS..." -ForegroundColor Cyan
+
+    try {
+        $compactStatus = Compact.exe /CompactOS:query 2>&1
+
+        if ($compactStatus -match "not compressed") {
+            Write-Host "      🔨 Đang nén Windows files (có thể mất vài phút)..." -ForegroundColor Cyan
+            Compact.exe /CompactOS:always 2>&1 | Out-Null
+            Write-Host "      ✅ Đã bật Compact OS (tiết kiệm 2-3GB)" -ForegroundColor Green
+        }
+        else {
+            Write-Host "      ⏭️  Compact OS đã được bật" -ForegroundColor DarkGray
+        }
+    }
+    catch {
+        Write-Warning "      ⚠️  Lỗi: $_"
+    }
+
+    # 3. TRIM Optimization for SSD
+    Write-Host "  ✂️  Tối ưu TRIM cho SSD..." -ForegroundColor Cyan
+
+    try {
+        $disk = Get-PhysicalDisk | Where-Object { $_.MediaType -eq "SSD" } | Select-Object -First 1
+
+        if ($disk) {
+            # Enable TRIM
+            fsutil behavior set DisableDeleteNotify 0 2>&1 | Out-Null
+
+            # Run TRIM manually
+            Optimize-Volume -DriveLetter C -ReTrim -Verbose 2>&1 | Out-Null
+
+            Write-Host "      ✅ Đã tối ưu TRIM cho SSD" -ForegroundColor Green
+        }
+        else {
+            Write-Host "      ⏭️  Không phát hiện SSD" -ForegroundColor DarkGray
+        }
+    }
+    catch {
+        Write-Warning "      ⚠️  Lỗi: $_"
+    }
+
+    # 4. Enable Storage Sense
+    Write-Host "  🧹 Bật Storage Sense (tự động cleanup)..." -ForegroundColor Cyan
+
+    try {
+        $storageSensePath = "HKCU:\Software\Microsoft\Windows\CurrentVersion\StorageSense\Parameters\StoragePolicy"
+        if (-not (Test-Path $storageSensePath)) {
+            New-Item -Path $storageSensePath -Force | Out-Null
+        }
+
+        Set-ItemProperty -Path $storageSensePath -Name "01" -Value 1 -Type DWord -Force
+        Set-ItemProperty -Path $storageSensePath -Name "04" -Value 1 -Type DWord -Force
+        Set-ItemProperty -Path $storageSensePath -Name "08" -Value 1 -Type DWord -Force
+        Set-ItemProperty -Path $storageSensePath -Name "32" -Value 1 -Type DWord -Force
+
+        Write-Host "      ✅ Đã bật Storage Sense" -ForegroundColor Green
+    }
+    catch {
+        Write-Warning "      ⚠️  Lỗi: $_"
+    }
+
+    Write-Host ""
+    Write-Host "  ✅ Storage optimization hoàn thành!" -ForegroundColor Green
+}
+
+# ============================================================================
+# GAMING OPTIMIZATION (NEW!)
+# ============================================================================
+
+function Optimize-Gaming {
+    <#
+    .SYNOPSIS
+        Tối ưu cho Gaming
+    #>
+
+    Write-Host ""
+    Write-Host "  🎮 Tối ưu Gaming Performance..." -ForegroundColor Yellow
+    Write-Host ""
+
+    # 1. Disable Game DVR
+    Write-Host "  📹 Tắt Game DVR & Game Bar..." -ForegroundColor Cyan
+
+    try {
+        $gameBarPath = "HKCU:\Software\Microsoft\Windows\CurrentVersion\GameDVR"
+        if (-not (Test-Path $gameBarPath)) {
+            New-Item -Path $gameBarPath -Force | Out-Null
+        }
+
+        Set-ItemProperty -Path $gameBarPath -Name "AppCaptureEnabled" -Value 0 -Type DWord -Force
+        Set-ItemProperty -Path $gameBarPath -Name "GameDVR_Enabled" -Value 0 -Type DWord -Force
+
+        $gameBarPath2 = "HKCU:\System\GameConfigStore"
+        if (-not (Test-Path $gameBarPath2)) {
+            New-Item -Path $gameBarPath2 -Force | Out-Null
+        }
+        Set-ItemProperty -Path $gameBarPath2 -Name "GameDVR_Enabled" -Value 0 -Type DWord -Force
+
+        Write-Host "      ✅ Đã tắt Game DVR & Game Bar" -ForegroundColor Green
+    }
+    catch {
+        Write-Warning "      ⚠️  Lỗi: $_"
+    }
+
+    # 2. Disable Fullscreen Optimization
+    Write-Host "  🖥️  Tắt Fullscreen Optimization..." -ForegroundColor Cyan
+
+    try {
+        $fsoPath = "HKCU:\System\GameConfigStore"
+        if (-not (Test-Path $fsoPath)) {
+            New-Item -Path $fsoPath -Force | Out-Null
+        }
+
+        Set-ItemProperty -Path $fsoPath -Name "GameDVR_FSEBehaviorMode" -Value 2 -Type DWord -Force
+        Set-ItemProperty -Path $fsoPath -Name "GameDVR_HonorUserFSEBehaviorMode" -Value 1 -Type DWord -Force
+        Set-ItemProperty -Path $fsoPath -Name "GameDVR_DXGIHonorFSEWindowsCompatible" -Value 1 -Type DWord -Force
+        Set-ItemProperty -Path $fsoPath -Name "GameDVR_EFSEFeatureFlags" -Value 0 -Type DWord -Force
+
+        Write-Host "      ✅ Đã tắt Fullscreen Optimization" -ForegroundColor Green
+    }
+    catch {
+        Write-Warning "      ⚠️  Lỗi: $_"
+    }
+
+    # 3. Enable Hardware-accelerated GPU Scheduling
+    Write-Host "  ⚡ Bật Hardware-accelerated GPU Scheduling..." -ForegroundColor Cyan
+
+    try {
+        $gpuPath = "HKLM:\SYSTEM\CurrentControlSet\Control\GraphicsDrivers"
+
+        # Check if supported
+        if (Test-Path $gpuPath) {
+            Set-ItemProperty -Path $gpuPath -Name "HwSchMode" -Value 2 -Type DWord -Force
+            Write-Host "      ✅ Đã bật GPU Hardware Scheduling (cần restart)" -ForegroundColor Green
+        }
+        else {
+            Write-Host "      ⚠️  GPU không hỗ trợ Hardware Scheduling" -ForegroundColor Yellow
+        }
+    }
+    catch {
+        Write-Warning "      ⚠️  Lỗi: $_"
+    }
+
+    # 4. Create Ultimate Performance Power Plan
+    Write-Host "  ⚡ Tạo Ultimate Performance Power Plan..." -ForegroundColor Cyan
+
+    try {
+        # Check if already exists
+        $ultimatePlan = powercfg /list | Select-String -Pattern "Ultimate Performance"
+
+        if (-not $ultimatePlan) {
+            # Unhide and duplicate Ultimate Performance plan
+            powercfg -duplicatescheme e9a42b02-d5df-448d-aa00-03f14749eb61 2>&1 | Out-Null
+            Write-Host "      ✅ Đã tạo Ultimate Performance plan" -ForegroundColor Green
+        }
+        else {
+            Write-Host "      ⏭️  Ultimate Performance plan đã tồn tại" -ForegroundColor DarkGray
+        }
+    }
+    catch {
+        Write-Warning "      ⚠️  Lỗi: $_"
+    }
+
+    Write-Host ""
+    Write-Host "  ✅ Gaming optimization hoàn thành!" -ForegroundColor Green
+}
+
+# ============================================================================
+# STARTUP & BOOT OPTIMIZATION (NEW!)
+# ============================================================================
+
+function Optimize-StartupBoot {
+    <#
+    .SYNOPSIS
+        Tối ưu Startup & Boot
+    #>
+
+    Write-Host ""
+    Write-Host "  🚀 Tối ưu Startup & Boot..." -ForegroundColor Yellow
+    Write-Host ""
+
+    # 1. Disable Unnecessary Startup Programs
+    Write-Host "  📋 Kiểm tra Startup Programs..." -ForegroundColor Cyan
+
+    try {
+        $startupApps = Get-CimInstance Win32_StartupCommand | Select-Object Name, Location, Command
+        Write-Host "      📊 Tìm thấy $($startupApps.Count) startup programs" -ForegroundColor DarkGray
+
+        # Just report, don't disable automatically (safer)
+        Write-Host "      ℹ️  Kiểm tra Task Manager > Startup để vô hiệu hóa apps không cần thiết" -ForegroundColor Yellow
+    }
+    catch {
+        Write-Warning "      ⚠️  Lỗi: $_"
+    }
+
+    # 2. Optimize Boot Timeout
+    Write-Host "  ⏱️  Tối ưu Boot Timeout..." -ForegroundColor Cyan
+
+    try {
+        # Reduce boot menu timeout to 3 seconds
+        bcdedit /timeout 3 2>&1 | Out-Null
+        Write-Host "      ✅ Đã giảm boot timeout xuống 3 giây" -ForegroundColor Green
+    }
+    catch {
+        Write-Warning "      ⚠️  Lỗi: $_"
+    }
+
+    # 3. Enable Fast Startup
+    Write-Host "  ⚡ Bật Fast Startup..." -ForegroundColor Cyan
+
+    try {
+        $fastStartupPath = "HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\Power"
+        Set-ItemProperty -Path $fastStartupPath -Name "HiberbootEnabled" -Value 1 -Type DWord -Force
+        Write-Host "      ✅ Đã bật Fast Startup" -ForegroundColor Green
+    }
+    catch {
+        Write-Warning "      ⚠️  Lỗi: $_"
+    }
+
+    Write-Host ""
+    Write-Host "  ✅ Startup & Boot optimization hoàn thành!" -ForegroundColor Green
 }
 
 # ============================================================================
@@ -485,7 +1169,7 @@ Register-WmiEvent -Query "SELECT * FROM Win32_PowerManagementEvent WHERE EventTy
 
     Write-Host ""
     Write-Host "  ╔═══════════════════════════════════════════════════════════╗" -ForegroundColor Green
-    Write-Host "  ║   ✅ DYNAMIC POWER MANAGEMENT ĐÃ ĐƯỢC CÀI ĐặT!          ║" -ForegroundColor Green
+    Write-Host "  ║   ✅ DYNAMIC POWER MANAGEMENT ĐÃ ĐƯỢC CÀI ĐẶT!          ║" -ForegroundColor Green
     Write-Host "  ╚═══════════════════════════════════════════════════════════╝" -ForegroundColor Green
     Write-Host ""
     Write-Host "  📋 Power Plans:" -ForegroundColor Cyan
@@ -531,17 +1215,47 @@ function Start-WindowsOptimization {
             Invoke-Debloat -BloatwareListPath $bloatwareList
         }
 
-        # 2. Registry Tweaks
+        # 2. Registry Tweaks (Basic + Enhanced)
         if ($config.modules.optimize.registryTweaks) {
             Set-RegistryTweaks
         }
 
-        # 3. Service Optimization
+        # 3. Performance Optimization (NEW!)
+        if ($config.modules.optimize.performanceTweaks) {
+            Optimize-Performance
+        }
+
+        # 4. Privacy & Security (NEW!)
+        if ($config.modules.optimize.privacyTweaks) {
+            Optimize-Privacy
+        }
+
+        # 5. Network Optimization (NEW!)
+        if ($config.modules.optimize.networkTweaks) {
+            Optimize-Network
+        }
+
+        # 6. Storage Optimization (NEW!)
+        if ($config.modules.optimize.storageTweaks) {
+            Optimize-Storage
+        }
+
+        # 7. Gaming Optimization (NEW!)
+        if ($config.modules.optimize.gamingTweaks) {
+            Optimize-Gaming
+        }
+
+        # 8. Startup & Boot Optimization (NEW!)
+        if ($config.modules.optimize.startupTweaks) {
+            Optimize-StartupBoot
+        }
+
+        # 9. Service Optimization
         if ($config.modules.optimize.serviceTweaks) {
             Optimize-WindowsServices
         }
 
-        # 4. Dynamic Power Management
+        # 10. Dynamic Power Management
         if ($config.modules.optimize.dynamicPowerPlan) {
             Set-DynamicPowerManagement -Config $config
         }
@@ -550,6 +1264,8 @@ function Start-WindowsOptimization {
         Write-Host "╔═══════════════════════════════════════════════════════════╗" -ForegroundColor Green
         Write-Host "║         ✅ TỐI ƯU WINDOWS HOÀN THÀNH!                    ║" -ForegroundColor Green
         Write-Host "╚═══════════════════════════════════════════════════════════╝" -ForegroundColor Green
+        Write-Host ""
+        Write-Host "  ⚠️  KHUYẾN NGHỊ: Khởi động lại máy để áp dụng đầy đủ các thay đổi!" -ForegroundColor Yellow
         Write-Host ""
     }
     catch {
@@ -567,6 +1283,12 @@ Export-ModuleMember -Function @(
     'Start-WindowsOptimization',
     'Invoke-Debloat',
     'Set-RegistryTweaks',
+    'Optimize-Performance',
+    'Optimize-Privacy',
+    'Optimize-Network',
+    'Optimize-Storage',
+    'Optimize-Gaming',
+    'Optimize-StartupBoot',
     'Optimize-WindowsServices',
     'Set-DynamicPowerManagement',
     'New-CustomPowerPlan'
