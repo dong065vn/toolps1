@@ -383,6 +383,18 @@ function Start-SystemCleanup {
 }
 
 # ============================================================================
+# ALIASES TIẾNG VIỆT - Vietnamese Aliases
+# ============================================================================
+
+# Thiết lập các aliases tiếng Việt cho các functions
+Set-Alias -Name 'BatDau-DonDepHeThong' -Value 'Start-SystemCleanup'
+Set-Alias -Name 'DonDep-FileTamThoi' -Value 'Clear-TemporaryFiles'
+Set-Alias -Name 'DonDep-BonhoDemWindowsUpdate' -Value 'Clear-WindowsUpdateCache'
+Set-Alias -Name 'DonDep-ThanhPhanHeThong' -Value 'Clear-SystemComponents'
+Set-Alias -Name 'DonDep-BonhoDemNguoiDung' -Value 'Clear-UserCache'
+Set-Alias -Name 'ChayDonDep-OiaCung' -Value 'Invoke-DiskCleanup'
+
+# ============================================================================
 # MODULE EXPORTS
 # ============================================================================
 
@@ -393,4 +405,14 @@ Export-ModuleMember -Function @(
     'Clear-SystemComponents',
     'Clear-UserCache',
     'Invoke-DiskCleanup'
+)
+
+# Export aliases tiếng Việt
+Export-ModuleMember -Alias @(
+    'BatDau-DonDepHeThong',
+    'DonDep-FileTamThoi',
+    'DonDep-BonhoDemWindowsUpdate',
+    'DonDep-ThanhPhanHeThong',
+    'DonDep-BonhoDemNguoiDung',
+    'ChayDonDep-OiaCung'
 )

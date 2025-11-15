@@ -1276,6 +1276,26 @@ function Start-WindowsOptimization {
 }
 
 # ============================================================================
+# ALIASES TIẾNG VIỆT - Vietnamese Aliases
+# ============================================================================
+
+# Thiết lập các aliases tiếng Việt cho các functions
+# Người dùng có thể sử dụng tên tiếng Việt thay vì tiếng Anh
+
+Set-Alias -Name 'BatDau-ToiUuWindows' -Value 'Start-WindowsOptimization'
+Set-Alias -Name 'GoBo-Bloatware' -Value 'Invoke-Debloat'
+Set-Alias -Name 'Cai-ToiUuRegistry' -Value 'Set-RegistryTweaks'
+Set-Alias -Name 'ToiUu-HieuSuat' -Value 'Optimize-Performance'
+Set-Alias -Name 'ToiUu-BaoMat' -Value 'Optimize-Privacy'
+Set-Alias -Name 'ToiUu-MangInternet' -Value 'Optimize-Network'
+Set-Alias -Name 'ToiUu-BoNho' -Value 'Optimize-Storage'
+Set-Alias -Name 'ToiUu-ChoiGame' -Value 'Optimize-Gaming'
+Set-Alias -Name 'ToiUu-KhoiDong' -Value 'Optimize-StartupBoot'
+Set-Alias -Name 'ToiUu-DichVu' -Value 'Optimize-WindowsServices'
+Set-Alias -Name 'Cai-QuanLyNguonDienDong' -Value 'Set-DynamicPowerManagement'
+Set-Alias -Name 'Tao-GoiNguonTuyChinh' -Value 'New-CustomPowerPlan'
+
+# ============================================================================
 # MODULE EXPORTS
 # ============================================================================
 
@@ -1292,4 +1312,20 @@ Export-ModuleMember -Function @(
     'Optimize-WindowsServices',
     'Set-DynamicPowerManagement',
     'New-CustomPowerPlan'
+)
+
+# Export aliases tiếng Việt
+Export-ModuleMember -Alias @(
+    'BatDau-ToiUuWindows',
+    'GoBo-Bloatware',
+    'Cai-ToiUuRegistry',
+    'ToiUu-HieuSuat',
+    'ToiUu-BaoMat',
+    'ToiUu-MangInternet',
+    'ToiUu-BoNho',
+    'ToiUu-ChoiGame',
+    'ToiUu-KhoiDong',
+    'ToiUu-DichVu',
+    'Cai-QuanLyNguonDienDong',
+    'Tao-GoiNguonTuyChinh'
 )

@@ -365,6 +365,18 @@ function Start-SoftwareInstallation {
 }
 
 # ============================================================================
+# ALIASES TIẾNG VIỆT - Vietnamese Aliases
+# ============================================================================
+
+# Thiết lập các aliases tiếng Việt cho các functions
+Set-Alias -Name 'BatDau-CaiDatPhanMem' -Value 'Start-SoftwareInstallation'
+Set-Alias -Name 'KiemTra-WingetSanSang' -Value 'Test-WingetAvailable'
+Set-Alias -Name 'CaiDat-Winget' -Value 'Install-Winget'
+Set-Alias -Name 'CaiDat-PhanMem' -Value 'Install-Software'
+Set-Alias -Name 'ChayScript-SauCaiDat' -Value 'Invoke-PostInstallScript'
+Set-Alias -Name 'DonDep-BonhoDemWinget' -Value 'Clear-WingetCache'
+
+# ============================================================================
 # MODULE EXPORTS
 # ============================================================================
 
@@ -375,4 +387,14 @@ Export-ModuleMember -Function @(
     'Install-Software',
     'Invoke-PostInstallScript',
     'Clear-WingetCache'
+)
+
+# Export aliases tiếng Việt
+Export-ModuleMember -Alias @(
+    'BatDau-CaiDatPhanMem',
+    'KiemTra-WingetSanSang',
+    'CaiDat-Winget',
+    'CaiDat-PhanMem',
+    'ChayScript-SauCaiDat',
+    'DonDep-BonhoDemWinget'
 )
