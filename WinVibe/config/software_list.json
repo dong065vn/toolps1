@@ -1,0 +1,62 @@
+[
+  {
+    "name": "Visual Studio Code",
+    "wingetId": "Microsoft.VisualStudioCode",
+    "postInstallScript": "post-install-scripts/VSCode.config.ps1",
+    "priority": 1
+  },
+  {
+    "name": "Google Chrome",
+    "wingetId": "Google.Chrome",
+    "postInstallScript": null,
+    "priority": 1
+  },
+  {
+    "name": "Mozilla Firefox",
+    "wingetId": "Mozilla.Firefox",
+    "postInstallScript": null,
+    "priority": 2
+  },
+  {
+    "name": "7-Zip",
+    "wingetId": "7zip.7zip",
+    "postInstallScript": null,
+    "priority": 1
+  },
+  {
+    "name": "VLC Media Player",
+    "wingetId": "VideoLAN.VLC",
+    "postInstallScript": null,
+    "priority": 2
+  },
+  {
+    "name": "Notepad++",
+    "wingetId": "Notepad++.Notepad++",
+    "postInstallScript": null,
+    "priority": 2
+  },
+  {
+    "name": "Git",
+    "wingetId": "Git.Git",
+    "postInstallScript": null,
+    "priority": 1
+  },
+  {
+    "name": "Microsoft PowerToys",
+    "wingetId": "Microsoft.PowerToys",
+    "postInstallScript": null,
+    "priority": 2
+  },
+  {
+    "name": "Adobe Acrobat Reader",
+    "wingetId": "Adobe.Acrobat.Reader.64-bit",
+    "postInstallScript": null,
+    "priority": 2
+  },
+  {
+    "name": "Discord",
+    "wingetId": "Discord.Discord",
+    "postInstallScript": null,
+    "priority": 3
+  }
+]

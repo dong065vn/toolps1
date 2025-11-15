@@ -1,0 +1,50 @@
+{
+  "general": {
+    "logPath": "C:\\WinVibe_Log.txt",
+    "enableLogging": true,
+    "verboseMode": true
+  },
+  "modules": {
+    "optimize": {
+      "enabled": true,
+      "debloat": true,
+      "registryTweaks": true,
+      "serviceTweaks": true,
+      "dynamicPowerPlan": true
+    },
+    "install": {
+      "enabled": true,
+      "runPostInstallScripts": true,
+      "cleanupAfterInstall": true
+    },
+    "clean": {
+      "enabled": true,
+      "cleanTemp": true,
+      "cleanWindowsUpdate": true,
+      "cleanDriverCache": true,
+      "cleanUserCache": true
+    }
+  },
+  "powerPlan": {
+    "pluggedInPlan": {
+      "name": "Vibe_PluggedIn",
+      "basePlan": "High Performance",
+      "settings": {
+        "monitorTimeout": 15,
+        "diskTimeout": 0,
+        "cpuMinState": 100,
+        "cpuMaxState": 100
+      }
+    },
+    "onBatteryPlan": {
+      "name": "Vibe_OnBattery",
+      "basePlan": "Balanced",
+      "settings": {
+        "monitorTimeout": 5,
+        "diskTimeout": 10,
+        "cpuMinState": 5,
+        "cpuMaxState": 85
+      }
+    }
+  }
+}

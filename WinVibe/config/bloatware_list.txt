@@ -1,0 +1,46 @@
+# Windows Bloatware List
+# Các ứng dụng này sẽ được gỡ bỏ trong quá trình tối ưu
+# Bỏ dấu # ở đầu dòng để enable gỡ bỏ app đó
+
+# Microsoft Bloatware
+Microsoft.BingNews
+Microsoft.BingWeather
+Microsoft.GetHelp
+Microsoft.Getstarted
+Microsoft.MicrosoftOfficeHub
+Microsoft.MicrosoftSolitaireCollection
+Microsoft.People
+Microsoft.WindowsFeedbackHub
+Microsoft.Xbox.TCUI
+Microsoft.XboxApp
+Microsoft.XboxGameOverlay
+Microsoft.XboxGamingOverlay
+Microsoft.XboxIdentityProvider
+Microsoft.XboxSpeechToTextOverlay
+Microsoft.ZuneMusic
+Microsoft.ZuneVideo
+Microsoft.YourPhone
+Microsoft.MixedReality.Portal
+
+# 3rd Party Bloatware
+*CandyCrush*
+*Facebook*
+*Twitter*
+*Spotify*
+*Disney*
+king.com.CandyCrushSaga
+king.com.CandyCrushSodaSaga
+
+# OEM Bloatware (uncomment nếu cần)
+# *Dell*
+# *HP*
+# *Lenovo*
+# *ASUS*
+# *Acer*
+
+# Windows Apps (cẩn thận khi gỡ)
+# Microsoft.WindowsMaps
+# Microsoft.WindowsCamera
+# Microsoft.ScreenSketch
+# Microsoft.Paint3D
+# Microsoft.3DBuilder

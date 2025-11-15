@@ -1,0 +1,34 @@
+{
+  "tempFolders": [
+    "%TEMP%",
+    "C:\\Windows\\Temp",
+    "C:\\Windows\\Prefetch",
+    "C:\\Windows\\SoftwareDistribution\\Download"
+  ],
+  "userCacheFolders": [
+    "%LOCALAPPDATA%\\Microsoft\\Windows\\Explorer\\thumbcache_*.db",
+    "%LOCALAPPDATA%\\Microsoft\\Windows\\INetCache",
+    "%LOCALAPPDATA%\\Microsoft\\Edge\\User Data\\Default\\Cache",
+    "%LOCALAPPDATA%\\Google\\Chrome\\User Data\\Default\\Cache",
+    "%APPDATA%\\Mozilla\\Firefox\\Profiles\\*.default*\\cache2"
+  ],
+  "systemCleaning": {
+    "dism": {
+      "enabled": true,
+      "command": "Dism.exe /Online /Cleanup-Image /StartComponentCleanup /ResetBase"
+    },
+    "cleanmgr": {
+      "enabled": true,
+      "sageset": 1
+    },
+    "windowsUpdate": {
+      "stopService": "wuauserv",
+      "cleanPath": "C:\\Windows\\SoftwareDistribution\\Download"
+    }
+  },
+  "excludePaths": [
+    "C:\\Windows\\System32",
+    "C:\\Program Files",
+    "C:\\Program Files (x86)"
+  ]
+}
